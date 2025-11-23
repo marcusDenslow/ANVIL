@@ -11,14 +11,16 @@ mod vga_buffer;
 pub extern "C" fn _start() -> ! {
     println!("Hello world{}", "!");
     println!("Hello world{}", "!");
+    panic!("some message");
 
 
     loop {}
 }
 
 
-//this function is called on panic
+// this funciton calls panic
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
+fn panic(info: &PanicInfo) -> ! {
+    println!("{}", info);
     loop {}
 }
