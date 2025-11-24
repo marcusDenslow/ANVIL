@@ -1,4 +1,4 @@
-use core::{fmt, panic::PanicInfo};
+use core::fmt;
 use lazy_static::lazy_static;
 use spin::Mutex;
 use volatile::Volatile;
@@ -141,4 +141,27 @@ lazy_static! {
         color_code: ColorCode::new(Color::Yellow, Color::Black),
         buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
     });
+}
+
+
+#[test_case]
+fn test_println_simple() {
+    println!("if this doesnt panic, its a pass, doesnt matter whats in here");
+}
+
+#[test_case]
+fn test_println_many() {
+    for _ in 0..200 {
+        println!("test_println_many output");
+    }
+}
+
+#[test_case]
+fn test_println_output() {
+    let s = "some test string that fits on a single line";
+    println!("{}", s);
+    for (i, c) in s.chars().enumerate() {
+        let screen_char = WRITER.lock().buffer.chars[BUFFER_HEIGHT - 2][i].read();
+        assert_eq!(char::from(screen_char.ascii_character), c);
+    }
 }

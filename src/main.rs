@@ -1,26 +1,43 @@
-#![no_std] //dont link the rust standard lib
-#![no_main] //disable all rust-level entry points
+#![no_std]
+#![no_main]
+#![feature(custom_test_frameworks)]
+#![test_runner(ANVIL::test_runner)]
+#![reexport_test_harness_main = "test_main"]
+
 
 use core::panic::PanicInfo;
+use ANVIL::println;
 
-
-mod vga_buffer;
-
-
-#[unsafe(no_mangle)] //dont mangle the name of this function
+#[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
-    println!("Hello world{}", "!");
-    println!("Hello world{}", "!");
-    panic!("some message");
+    println!("Hello wolrd{}", "!");
 
+    ANVIL::init();
 
+    fn stack_overflow() {
+        stack_overflow();
+    }
+
+    stack_overflow();
+
+    #[cfg(test)]
+    test_main();
+
+    println!("it did not crash!");
     loop {}
 }
 
 
-// this funciton calls panic
+#[cfg(not(test))]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
     loop {}
+}
+
+
+#[cfg(test)]
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    ANVIL::test_panic_handler(info);
 }
