@@ -11,6 +11,7 @@ pub mod serial;
 pub mod vga_buffer;
 pub mod interrupts;
 pub mod gdt;
+pub mod memory;
 
 
 pub trait Testable {
@@ -38,6 +39,8 @@ pub enum QemuExitCode {
 pub fn init() {
     gdt::init();
     interrupts::init_idt();
+    unsafe { interrupts::PICS.lock().initialize() };
+    x86_64::instructions::interrupts::enable();
 }
 
 pub fn exit_qemu(exit_code: QemuExitCode) {
@@ -46,6 +49,12 @@ pub fn exit_qemu(exit_code: QemuExitCode) {
     unsafe {
         let mut port = Port::new(0xf4);
         port.write(exit_code as u32);
+    }
+}
+
+pub fn hlt_loop() -> ! {
+    loop {
+        x86_64::instructions::hlt();
     }
 }
 
@@ -61,7 +70,7 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
     serial_println!("[failed]\n");
     serial_println!("Error: {}\n", info);
     exit_qemu(QemuExitCode::Failed);
-    loop {}
+    hlt_loop();
 }
 
 /// Entry point for `cargo test`
@@ -70,11 +79,25 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
 pub extern "C" fn _start() -> ! {
     init();
     test_main();
-    loop {}
+    hlt_loop();
 }
 
 #[cfg(test)]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     test_panic_handler(info)
+}
+
+#[cfg(test)]
+use bootloader::{entry_point, BootInfo};
+
+#[cfg(test)]
+entry_point!(test_kernel_main);
+
+
+#[cfg(test)]
+fn test_kernel_main(_boot_info: &'static BootInfo) -> ! {
+    init();
+    test_main();
+    hlt_loop();
 }
