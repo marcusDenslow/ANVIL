@@ -24,6 +24,10 @@ bench = false
 name = "stack_overflow"
 harness = false
 
+[[test]]
+name = "should_panic"
+harness = false
+
 [dependencies]
 bootloader = { version = "0.9", features = ["map_physical_memory"]}
 volatile = "0.2.6"
@@ -31,6 +35,7 @@ spin = "0.5.2"
 x86_64 = "0.14.2"
 uart_16550 = "0.2.0"
 pic8259 = "0.10.1"
+linked_list_allocator = "0.9.0"
 pc-keyboard = "0.7.0"
 
 [dependencies.lazy_static]

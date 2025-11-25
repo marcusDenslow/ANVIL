@@ -6,7 +6,7 @@
 
 extern crate alloc;
 
-use alloc::boxed::Box;
+use alloc::{boxed::Box, vec, vec::Vec, rc::Rc};
 
 
 use bootloader::{ BootInfo, entry_point};
@@ -20,6 +20,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     use ANVIL::memory;
     use x86_64::{structures::paging::Page, VirtAddr};
     use ANVIL::memory::BootInfoFrameAllocator;
+    use ANVIL::allocator;
 
 
     println!("John Marston{}", "!");
@@ -31,7 +32,24 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
         BootInfoFrameAllocator::init(&boot_info.memory_map)
     };
 
-    let x = Box::new(41);
+    allocator::init_heap(&mut mapper, &mut frame_allocator)
+        .expect("heap initialization failed");
+
+    let heap_value = Box::new(41);
+    println!("heap_value at {:p}", heap_value);
+
+    let mut vec = Vec::new();
+    for i in 0..500 {
+        vec.push(i);
+    }
+    println!("vec at {:p}", vec.as_slice());
+
+
+    let reference_counted = Rc::new(vec![1, 2, 3]);
+    let cloned_reference = reference_counted.clone();
+    println!("current reference count is {}", Rc::strong_count(&cloned_reference));
+    core::mem::drop(reference_counted);
+    println!("refrenece count is {} now", Rc::strong_count(&cloned_reference));
 
 
 
