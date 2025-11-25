@@ -4,6 +4,10 @@
 #![test_runner(ANVIL::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
+extern crate alloc;
+
+use alloc::boxed::Box;
+
 
 use bootloader::{ BootInfo, entry_point};
 use core::panic::PanicInfo;
@@ -13,20 +17,22 @@ entry_point!(kernel_main);
 
 #[unsafe(no_mangle)]
 fn kernel_main(boot_info: &'static BootInfo) -> ! {
-    use ANVIL::memory::active_level_4_table;
-    use x86_64::VirtAddr;
+    use ANVIL::memory;
+    use x86_64::{structures::paging::Page, VirtAddr};
+    use ANVIL::memory::BootInfoFrameAllocator;
 
-    println!("Hello world{}", "!");
+
+    println!("John Marston{}", "!");
     ANVIL::init();
 
     let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);
-    let l4_table = unsafe { active_level_4_table(phys_mem_offset) };
+    let mut mapper = unsafe { memory::init(phys_mem_offset) };
+    let mut frame_allocator = unsafe {
+        BootInfoFrameAllocator::init(&boot_info.memory_map)
+    };
 
-    for (i, entry) in l4_table.iter().enumerate() {
-        if !entry.is_unused() {
-            println!("L4 Entry {}: {:?}", i, entry);
-        }
-    }
+    let x = Box::new(41);
+
 
 
     #[cfg(test)]
