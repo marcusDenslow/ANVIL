@@ -1,13 +1,13 @@
 #![no_std]
 #![no_main]
 #![feature(custom_test_frameworks)]
-#![test_runner(ANVIL::test_runner)]
+#![test_runner(anvil::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
 
 extern crate alloc;
 
-use ANVIL::allocator::HEAP_SIZE;
+use anvil::allocator::HEAP_SIZE;
 use alloc::vec::Vec;
 use alloc::boxed::Box;
 use bootloader::{entry_point, BootInfo};
@@ -16,11 +16,11 @@ use core::panic::PanicInfo;
 entry_point!(main);
 
 fn main(boot_info: &'static BootInfo) -> ! {
-    use ANVIL::allocator;
-    use ANVIL::memory::{self, BootInfoFrameAllocator};
+    use anvil::allocator;
+    use anvil::memory::{self, BootInfoFrameAllocator};
     use x86_64::VirtAddr;
 
-    ANVIL::init();
+    anvil::init();
     let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);
     let mut mapper = unsafe { memory::init(phys_mem_offset) };
     let mut frame_allocator = unsafe {
@@ -35,7 +35,7 @@ fn main(boot_info: &'static BootInfo) -> ! {
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    ANVIL::test_panic_handler(info)
+    anvil::test_panic_handler(info)
 }
 
 #[test_case]

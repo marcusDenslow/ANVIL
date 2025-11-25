@@ -1,7 +1,7 @@
 #![no_std]
 #![no_main]
 #![feature(custom_test_frameworks)]
-#![test_runner(ANVIL::test_runner)]
+#![test_runner(anvil::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
 extern crate alloc;
@@ -11,20 +11,20 @@ use alloc::{boxed::Box, vec, vec::Vec, rc::Rc};
 
 use bootloader::{ BootInfo, entry_point};
 use core::panic::PanicInfo;
-use ANVIL::println;
+use anvil::println;
 
 entry_point!(kernel_main);
 
 #[unsafe(no_mangle)]
 fn kernel_main(boot_info: &'static BootInfo) -> ! {
-    use ANVIL::memory;
-    use x86_64::{structures::paging::Page, VirtAddr};
-    use ANVIL::memory::BootInfoFrameAllocator;
-    use ANVIL::allocator;
+    use anvil::memory;
+    use x86_64::{VirtAddr};
+    use anvil::memory::BootInfoFrameAllocator;
+    use anvil::allocator;
 
 
     println!("John Marston{}", "!");
-    ANVIL::init();
+    anvil::init();
 
     let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);
     let mut mapper = unsafe { memory::init(phys_mem_offset) };
@@ -57,7 +57,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     test_main();
 
     println!("it did not crash!");
-    ANVIL::hlt_loop();
+    anvil::hlt_loop();
 }
 
 
@@ -73,5 +73,5 @@ fn panic(info: &PanicInfo) -> ! {
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
-    ANVIL::hlt_loop();
+    anvil::hlt_loop();
 }

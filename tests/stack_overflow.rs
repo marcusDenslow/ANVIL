@@ -6,14 +6,14 @@
 use core::panic::PanicInfo;
 use lazy_static::lazy_static;
 use x86_64::structures::idt::InterruptDescriptorTable;
-use ANVIL::{exit_qemu, QemuExitCode, serial_println, serial_print };
+use anvil::{exit_qemu, QemuExitCode, serial_println, serial_print };
 use x86_64::structures::idt::InterruptStackFrame;
 
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
     serial_print!("stack_overflow::stack_overflow...\t");
 
-    ANVIL::gdt::init();
+    anvil::gdt::init();
     init_test_idt();
 
     // trigger a stack overflow
@@ -37,7 +37,7 @@ lazy_static! {
         unsafe {
             idt.double_fault
                 .set_handler_fn(test_double_fault_handler)
-                .set_stack_index(ANVIL::gdt::DOUBLE_FAULT_IST_INDEX);
+                .set_stack_index(anvil::gdt::DOUBLE_FAULT_IST_INDEX);
         }
         idt
     };
@@ -56,5 +56,5 @@ fn stack_overflow() {
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    ANVIL::test_panic_handler(info)
+    anvil::test_panic_handler(info)
 }

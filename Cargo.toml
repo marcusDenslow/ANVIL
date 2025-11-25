@@ -1,5 +1,5 @@
 [package]
-name = "ANVIL"
+name = "anvil"
 version = "0.1.0"
 authors = ["Marcus Allen Denslow <marcus.allen.denslow@gmail.com>"]
 edition = "2024"
@@ -16,7 +16,7 @@ test-timeout = 300 # in seconds
 [profile.release]
 
 [[bin]]
-name = "ANVIL"
+name = "anvil"
 test = true
 bench = false
 

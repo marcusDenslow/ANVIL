@@ -1,11 +1,11 @@
 #![no_std]
 #![no_main]
 #![feature(custom_test_frameworks)]
-#![test_runner(ANVIL::test_runner)]
+#![test_runner(anvil::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
-use ANVIL::println;
+use anvil::println;
 
 #[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
@@ -20,7 +20,7 @@ fn test_runner(tests: &[&dyn Fn()]) {
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    ANVIL::test_panic_handler(info)
+    anvil::test_panic_handler(info)
 }
 
 #[test_case]

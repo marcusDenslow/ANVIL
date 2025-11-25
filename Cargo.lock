@@ -3,7 +3,7 @@
 version = 4
 
 [[package]]
-name = "ANVIL"
+name = "anvil"
 version = "0.1.0"
 dependencies = [
  "bootloader",
